@@ -26,12 +26,8 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         post_id = int(self.kwargs.get('post_id'))
-
-        instance = serializer.save(author=self.request.user, post_id=post_id)
-
-        print('post_id from URL:', post_id, type(post_id))
-        print('instance.post_id:', instance.post_id, type(instance.post_id))
-        print('serializer.data:', serializer.data)
+        post = get_object_or_404(Post, id=post_id)
+        serializer.save(author=self.request.user, post=post)
 
 
 class GroupViewSet(viewsets.ReadOnlyModelViewSet):
