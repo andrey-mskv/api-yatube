@@ -1,4 +1,5 @@
 from rest_framework import viewsets
+from django.shortcuts import get_object_or_404
 
 from posts.models import Comment, Post, Group
 from .serializers import CommentSerializer, GroupSerializer, PostSerializer
@@ -11,26 +12,25 @@ class PostViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthorOrReadOnly]
 
     def perform_create(self, serializer):
+        """Устанавливает текущего пользователя автором поста."""
         serializer.save(author=self.request.user)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
-    # queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = [IsAuthorOrReadOnly]
 
     def get_queryset(self):
+        """Возвращает комментарии указанного поста."""
         post_id = self.kwargs.get('post_id')
-        return Comment.objects.filter(post__id=post_id)
+        post = get_object_or_404(Post, id=post_id)
+        return Comment.objects.filter(post=post)
 
     def perform_create(self, serializer):
+        """Создаёт комментарий для указанного поста."""
         post_id = int(self.kwargs.get('post_id'))
-
-        instance = serializer.save(author=self.request.user, post_id=post_id)
-
-        print('post_id from URL:', post_id, type(post_id))
-        print('instance.post_id:', instance.post_id, type(instance.post_id))
-        print('serializer.data:', serializer.data)
+        post = get_object_or_404(Post, id=post_id)
+        serializer.save(author=self.request.user, post=post)
 
 
 class GroupViewSet(viewsets.ReadOnlyModelViewSet):

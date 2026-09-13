@@ -7,7 +7,6 @@ class PostSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
         read_only=True, slug_field='username'
     )
-    # comments = serializers.StringRelatedField(many=True, read_only=True)
 
     class Meta:
         fields = (
@@ -17,10 +16,8 @@ class PostSerializer(serializers.ModelSerializer):
             'author',
             'image',
             'group',
-            # 'comments',
         )
         model = Post
-        # read_only_fields = ('author',)
 
 
 class GroupSerializer(serializers.ModelSerializer):
